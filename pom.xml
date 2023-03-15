@@ -6,7 +6,7 @@
 
     <groupId>dev.j3fftw</groupId>
     <artifactId>WorldEditSlimefun</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>UNOFFICIAL</version>
     <packaging>jar</packaging>
 
     <name>WorldEditSlimefun</name>

@@ -74,6 +74,6 @@ public final class WorldEditSlimefun extends JavaPlugin implements SlimefunAddon
     @Nullable
     @Override
     public String getBugTrackerURL() {
-        return "empty";
+        return "https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/issues";
     }
 }
