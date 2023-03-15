@@ -1,6 +1,6 @@
 # WorldEditSlimefun
 
-This plugin only works on Paper and it forks.
+This plugin only works on Paper and it's forks.
 
 WorldEditSlimefun allows people to paste in Slimefun blocks.
 This can especially be helpful for addon creators, server owners and people who test plugins.
@@ -9,8 +9,8 @@ This can be helpful with testing how optimized the blocks are or if they would c
 ## Commands
 - `/wsef pos1` This command sets the location for position 1 for your paste/clear command.
 - `/wsef pos2` This command sets the location for position 2 for your paste/clear command.
-- `/wsef paste *Slimefun ID*` This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun id. This can be any placeable Slimefun block or it's addons.
-- `/wsef clear *boolean*` This command clears the blocks you have selected with the position commands. When **TRUE** it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When **FALSE** it just removes the block and the blockstorage data.
+- `/wsef paste <Slimefun ID>` This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun id. This can be any placeable Slimefun block or it's addons.
+- `/wsef clear <boolean>` This command clears the blocks you have selected with the position commands. When `true` it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When `false` it just removes the block and the blockstorage data.
 
 ## Download
-You can find the download of this addon in the [releases](https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/releases/tag/5) tab
+You can find the download of this addon in the [releases](https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/releases/tag/latest) tab
