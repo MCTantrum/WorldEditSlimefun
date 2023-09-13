@@ -24,7 +24,7 @@ public final class WorldEditSlimefunDispatchManager extends PaperCommandManager 
 
         registerCommand(new WorldEditSlimefunCommands());
 
-        getCommandCompletions().registerCompletion("SLIMEFUN_ITEMS", context -> {
+        getCommandCompletions().registerCompletion("slimefun_items", context -> {
             List<SlimefunItem> list = Slimefun.getRegistry().getEnabledSlimefunItems();
             List<String> unPlaceableItems = new ArrayList<>();
             for (SlimefunItem item : list) {
@@ -34,5 +34,7 @@ public final class WorldEditSlimefunDispatchManager extends PaperCommandManager 
             }
             return unPlaceableItems;
         });
+
+        getCommandCompletions().registerCompletion("boolean", context -> List.of("true", "false"));
     }
 }
