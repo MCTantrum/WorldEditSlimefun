@@ -5,9 +5,7 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Description;
 import co.aikar.commands.annotation.Subcommand;
-import co.aikar.commands.annotation.Syntax;
 import dev.j3fftw.worldeditslimefun.WorldEditSlimefun;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemHandler;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
@@ -21,7 +19,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -30,13 +27,12 @@ import org.bukkit.event.block.BlockPlaceEvent;
 public class WorldEditSlimefunCommands extends BaseCommand {
 
     @Default
-    public void onDefault(CommandSender sender) {
-        sender.sendMessage(ChatColor.RED + "Please provide a valid subcommand.");
+    public void onDefault(Player player) {
+        player.sendMessage(ChatColor.RED + "Please provide a valid subcommand.");
     }
 
     @Subcommand("pos1")
     @CommandPermission("wesf.admin")
-    @Description("This command sets the location for position 1 for your paste/clear command.")
     public void onPos1(Player player) {
         WorldEditSlimefun.getInstance().addPositionOne(player);
         player.sendMessage("Set position 1 to " + beautifyBlockPosition(player));
@@ -44,7 +40,6 @@ public class WorldEditSlimefunCommands extends BaseCommand {
 
     @Subcommand("pos2")
     @CommandPermission("wesf.admin")
-    @Description("This command sets the location for position 2 for your paste/clear command.")
     public void onPos2(Player player) {
         WorldEditSlimefun.getInstance().addPositionTwo(player);
         player.sendMessage("Set position 2 to " + beautifyBlockPosition(player));
@@ -56,10 +51,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     }
 
     @Subcommand("paste")
-    @Syntax("[slimefun_item]")
-    @CommandCompletion("@slimefun_items")
     @CommandPermission("wesf.admin")
-    @Description("This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun item id. This can be any placeable Slimefun or Slimefun Addon block.")
+    @CommandCompletion("@slimefun_items")
     public void paste(Player player, String sfId) {
         BlockPosition pos1 = WorldEditSlimefun.getInstance().getPositionOne(player);
         BlockPosition pos2 = WorldEditSlimefun.getInstance().getPositionTwo(player);
@@ -101,15 +94,13 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         }
 
         long time = System.currentTimeMillis() - start;
-        player.sendMessage("Pasted " + ammountOfBlocks + " " + sfItem.getItemName() + "(s)");
+        player.sendMessage("Pasted " + ammountOfBlocks + " " + sfItem.getItemName() + ChatColor.WHITE + " (s)");
         player.sendMessage("Took " + time + "ms to paste!");
     }
 
     @Subcommand("clear")
-    @Syntax("[call_event]")
     @CommandCompletion("@boolean")
     @CommandPermission("wesf.admin")
-    @Description("This command clears the blocks you have selected with the position commands. When true it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When false it just removes the block and the blockstorage data.")
     public void clear(Player player, boolean callEvent) {
         BlockPosition pos1 = WorldEditSlimefun.getInstance().getPositionOne(player);
         BlockPosition pos2 = WorldEditSlimefun.getInstance().getPositionTwo(player);
@@ -147,7 +138,7 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         }
 
         long time = System.currentTimeMillis() - start;
-        player.sendMessage("Removed " + ammountOfBlocks + " blocks");
-        player.sendMessage("Took " + time + "ms to paste!");
+        player.sendMessage("Cleared " + ammountOfBlocks + " blocks");
+        player.sendMessage("Took " + time + "ms to clear!");
     }
 }
