@@ -7,10 +7,10 @@ This can especially be helpful for addon creators, server owners and people who 
 This can be helpful with testing how optimized the blocks are or if they would cause any issues in mass usage.
 
 ## Commands
-- `/wsef pos1` This command sets the location for position 1 for your paste/clear command.
-- `/wsef pos2` This command sets the location for position 2 for your paste/clear command.
-- `/wsef paste <Slimefun ID>` This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun item id. This can be any placeable Slimefun or Slimefun Addon block.
-- `/wsef clear <boolean>` This command clears the blocks you have selected with the position commands. When `true` it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When `false` it just removes the block and the blockstorage data.
+- `/wesf pos1` This command sets the location for position 1 for your paste/clear command.
+- `/wesf pos2` This command sets the location for position 2 for your paste/clear command.
+- `/wesf paste <Slimefun ID>` This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun item id. This can be any placeable Slimefun or Slimefun Addon block.
+- `/wesf clear <boolean>` This command clears the blocks you have selected with the position commands. When `true` it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When `false` it just removes the block and the blockstorage data.
 
 ## Download
 You can find the download of this addon in the [releases](https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/releases/tag/latest) tab

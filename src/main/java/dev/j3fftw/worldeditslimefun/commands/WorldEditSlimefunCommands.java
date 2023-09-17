@@ -26,7 +26,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-@CommandAlias("sfedit")
+@CommandAlias("wesf|sfedit")
 public class WorldEditSlimefunCommands extends BaseCommand {
 
     @Default
