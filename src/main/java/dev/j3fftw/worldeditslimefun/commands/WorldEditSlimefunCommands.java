@@ -34,14 +34,14 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     @Subcommand("pos1")
     @CommandPermission("wesf.admin")
     public void onPos1(Player player) {
-        WorldEditSlimefun.getInstance().addPositionOne(player);
+        WorldEditSlimefun.addPositionOne(player);
         player.sendMessage("Set position 1 to " + beautifyBlockPosition(player));
     }
 
     @Subcommand("pos2")
     @CommandPermission("wesf.admin")
     public void onPos2(Player player) {
-        WorldEditSlimefun.getInstance().addPositionTwo(player);
+        WorldEditSlimefun.addPositionTwo(player);
         player.sendMessage("Set position 2 to " + beautifyBlockPosition(player));
     }
 
@@ -54,8 +54,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     @CommandPermission("wesf.admin")
     @CommandCompletion("@slimefun_items")
     public void paste(Player player, String sfId) {
-        BlockPosition pos1 = WorldEditSlimefun.getInstance().getPositionOne(player);
-        BlockPosition pos2 = WorldEditSlimefun.getInstance().getPositionTwo(player);
+        BlockPosition pos1 = WorldEditSlimefun.getPositionOne(player);
+        BlockPosition pos2 = WorldEditSlimefun.getPositionTwo(player);
         if (pos1 == null || pos2 == null) {
             return;
         }
@@ -102,8 +102,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     @CommandCompletion("@boolean")
     @CommandPermission("wesf.admin")
     public void clear(Player player, boolean callEvent) {
-        BlockPosition pos1 = WorldEditSlimefun.getInstance().getPositionOne(player);
-        BlockPosition pos2 = WorldEditSlimefun.getInstance().getPositionTwo(player);
+        BlockPosition pos1 = WorldEditSlimefun.getPositionOne(player);
+        BlockPosition pos2 = WorldEditSlimefun.getPositionTwo(player);
         if (pos1 == null || pos2 == null) {
             return;
         }
