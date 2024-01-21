@@ -21,6 +21,13 @@ jobs:
           java-version: 17
       - name: Build with Maven
         run: mvn -B package
+      - name: Upload to Blob Builds
+        uses: WalshyDev/blob-builds/gh-action@main
+        with:
+          project: WorldEditSlimefun
+          apiToken: ${{ secrets.BLOB_BUILDS_API_TOKEN }}
+          file: ./target/WorldEditSlimefun.jar
+          releaseNotes: ${{ github.event.head_commit.message }}
       - name: Create a Release
         id: create_release
         uses: actions/create-release@v1
