@@ -22,6 +22,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 @CommandAlias("wesf|sfedit")
 public class WorldEditSlimefunCommands extends BaseCommand {
@@ -31,23 +32,28 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         player.sendMessage(ChatColor.RED + "Please provide a valid subcommand.");
     }
 
+    @Subcommand("wand")
+    @CommandPermission("wesf.admin")
+    public void onWand(Player player) {
+        final ItemStack wand = SlimefunItem.getOptionalById("WEF_WAND").map(SlimefunItem::getItem).orElse(null);
+        if (wand == null) {
+            player.sendMessage(ChatColor.RED + "Wand not found!");
+            return;
+        }
+
+        player.getInventory().addItem(wand);
+    }
+
     @Subcommand("pos1")
     @CommandPermission("wesf.admin")
     public void onPos1(Player player) {
         WorldEditSlimefun.addPositionOne(player);
-        player.sendMessage("Set position 1 to " + beautifyBlockPosition(player));
     }
 
     @Subcommand("pos2")
     @CommandPermission("wesf.admin")
     public void onPos2(Player player) {
         WorldEditSlimefun.addPositionTwo(player);
-        player.sendMessage("Set position 2 to " + beautifyBlockPosition(player));
-    }
-
-    public String beautifyBlockPosition(Player player) {
-        final BlockPosition position = new BlockPosition(player.getLocation());
-        return "%s, %s, %s (%s)".formatted(position.getX(), position.getY(), position.getZ(), position.getWorld().getName());
     }
 
     @Subcommand("paste")

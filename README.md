@@ -7,6 +7,7 @@ This can especially be helpful for addon creators, server owners and people who 
 This can be helpful with testing how optimized the blocks are or if they would cause any issues in mass usage.
 
 ## Commands
+- `/wesf wand` This command gives a player the selection wand
 - `/wesf pos1` This command sets the location for position 1 for your paste/clear command.
 - `/wesf pos2` This command sets the location for position 2 for your paste/clear command.
 - `/wesf paste <Slimefun ID>` This command pastes the block you specified in the world with the position you chose. It has 1 argument that is the slimefun item id. This can be any placeable Slimefun or Slimefun Addon block.
