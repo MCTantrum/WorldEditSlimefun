@@ -106,7 +106,7 @@ public class WorldEditSlimefunCommands extends BaseCommand {
             return;
         }
 
-        boolean charge = sfItem instanceof EnergyNetComponent component && component.isChargeable();
+        boolean charge = energy && sfItem instanceof EnergyNetComponent component && component.isChargeable();
         boolean fillItems = inputs != null && Slimefun.getRegistry().getMenuPresets().containsKey(sfId) && hasValidInputs(inputs);
 
         ItemStack item = sfItem.getItem();
