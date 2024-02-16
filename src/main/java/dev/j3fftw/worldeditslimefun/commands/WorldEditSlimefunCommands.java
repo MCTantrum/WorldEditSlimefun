@@ -1,20 +1,32 @@
 package dev.j3fftw.worldeditslimefun.commands;
 
 import co.aikar.commands.BaseCommand;
+import co.aikar.commands.BukkitCommandCompletionContext;
+import co.aikar.commands.CommandCompletions;
+import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.CommandCompletion;
 import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Default;
+import co.aikar.commands.annotation.Optional;
 import co.aikar.commands.annotation.Subcommand;
 import dev.j3fftw.worldeditslimefun.WorldEditSlimefun;
+import dev.j3fftw.worldeditslimefun.utils.PositionManager;
+import dev.j3fftw.worldeditslimefun.utils.Utils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.implementation.items.blocks.UnplaceableBlock;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.blocks.BlockPosition;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -24,11 +36,35 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 @CommandAlias("wesf|sfedit")
+@CommandPermission("wesf.admin")
 public class WorldEditSlimefunCommands extends BaseCommand {
+
+    public static void init(WorldEditSlimefun plugin) {
+        PaperCommandManager manager = new PaperCommandManager(plugin);
+        CommandCompletions<BukkitCommandCompletionContext> completions = manager.getCommandCompletions();
+
+        completions.registerCompletion("slimefun_blocks", context -> Utils.SLIMEFUN_BLOCKS);
+        completions.registerCompletion("slimefun_items", context -> Utils.SLIMEFUN_ITEMS);
+        completions.registerCompletion("materials", context -> {
+            final List<String> inputs = new ArrayList<>();
+            final World world = context.getPlayer().getWorld();
+            for (Material material : Utils.MATERIALS.values()) {
+                if (material.isEnabledByFeature(world)) {
+                    inputs.add(material.name());
+                }
+            }
+            inputs.sort(Comparator.naturalOrder());
+            return inputs;
+        });
+
+        manager.registerCommand(new WorldEditSlimefunCommands());
+    }
 
     @Default
     public void onDefault(Player player) {
@@ -36,9 +72,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     }
 
     @Subcommand("wand")
-    @CommandPermission("wesf.admin")
     public void onWand(Player player) {
-        final ItemStack wand = SlimefunItem.getOptionalById("WEF_WAND").map(SlimefunItem::getItem).orElse(null);
+        ItemStack wand = SlimefunItem.getOptionalById("WESF_WAND").map(SlimefunItem::getItem).orElse(null);
         if (wand == null) {
             player.sendMessage(ChatColor.RED + "Wand not found!");
             return;
@@ -48,23 +83,20 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     }
 
     @Subcommand("pos1")
-    @CommandPermission("wesf.admin")
     public void onPos1(Player player) {
-        WorldEditSlimefun.addPositionOne(player);
+        PositionManager.addPositionOne(player);
     }
 
     @Subcommand("pos2")
-    @CommandPermission("wesf.admin")
     public void onPos2(Player player) {
-        WorldEditSlimefun.addPositionTwo(player);
+        PositionManager.addPositionTwo(player);
     }
 
     @Subcommand("paste")
-    @CommandPermission("wesf.admin")
-    @CommandCompletion("@slimefun_items")
-    public void paste(Player player, String sfId) {
-        BlockPosition pos1 = WorldEditSlimefun.getPositionOne(player);
-        BlockPosition pos2 = WorldEditSlimefun.getPositionTwo(player);
+    @CommandCompletion("@slimefun_blocks true|false @slimefun_items|@materials")
+    public void paste(Player player, String sfId, @Default("false") boolean energy, @Optional String[] inputs) {
+        BlockPosition pos1 = PositionManager.getPositionOne(player);
+        BlockPosition pos2 = PositionManager.getPositionTwo(player);
         if (pos1 == null || pos2 == null) {
             return;
         }
@@ -73,6 +105,9 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         if (sfItem == null || sfItem instanceof UnplaceableBlock) {
             return;
         }
+
+        boolean charge = sfItem instanceof EnergyNetComponent component && component.isChargeable();
+        boolean fillItems = inputs != null && Slimefun.getRegistry().getMenuPresets().containsKey(sfId) && hasValidInputs(inputs);
 
         ItemStack item = sfItem.getItem();
         long start = System.currentTimeMillis();
@@ -84,6 +119,20 @@ public class WorldEditSlimefunCommands extends BaseCommand {
                         block.getRelative(BlockFace.DOWN), item, player, true, EquipmentSlot.HAND);
                 handler.onPlayerPlace(event);
             });
+
+            if (charge) {
+                BlockStorage.addBlockInfo(block, "energy-charge", String.valueOf(Integer.MAX_VALUE), false);
+            }
+
+            if (fillItems) {
+                final BlockMenu menu = BlockStorage.getInventory(block);
+                final int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
+                for (ItemStack input : getInputs(inputs)) {
+                    if (menu.pushItem(input, slots) != null) {
+                        break;
+                    }
+                }
+            }
         });
         long time = System.currentTimeMillis() - start;
 
@@ -92,11 +141,10 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     }
 
     @Subcommand("clear")
-    @CommandCompletion("@boolean")
-    @CommandPermission("wesf.admin")
-    public void clear(Player player, boolean callEvent) {
-        BlockPosition pos1 = WorldEditSlimefun.getPositionOne(player);
-        BlockPosition pos2 = WorldEditSlimefun.getPositionTwo(player);
+    @CommandCompletion("true|false")
+    public void clear(Player player, @Default("false") boolean callEvent) {
+        BlockPosition pos1 = PositionManager.getPositionOne(player);
+        BlockPosition pos2 = PositionManager.getPositionTwo(player);
         if (pos1 == null || pos2 == null) {
             return;
         }
@@ -117,6 +165,44 @@ public class WorldEditSlimefunCommands extends BaseCommand {
 
         player.sendMessage("Cleared " + amountOfBlocks + " blocks");
         player.sendMessage("Took " + time + "ms to clear!");
+    }
+
+    private boolean hasValidInputs(String[] inputs) {
+        boolean hasValid = false;
+        for (int i = 0; i < inputs.length; i++) {
+            boolean valid = isValidInput(inputs[i]);
+            hasValid = hasValid || valid;
+            if (!valid) {
+                inputs[i] = null;
+            }
+        }
+        return hasValid;
+    }
+
+    private boolean isValidInput(String input) {
+        if (input == null || input.equals("AIR")) {
+            return false;
+        }
+
+        if (SlimefunItem.getById(input) != null) {
+            return true;
+        }
+
+        return Utils.isValidMaterial(input);
+    }
+
+    private List<ItemStack> getInputs(String[] inputs) {
+        List<ItemStack> newInputs = new ArrayList<>();
+        for (String input : inputs) {
+            SlimefunItem slimefunItem = SlimefunItem.getById(input);
+            Material material = Utils.getMaterial(input);
+            if (slimefunItem != null) {
+                newInputs.add(new CustomItemStack(slimefunItem.getItem(), slimefunItem.getItem().getMaxStackSize()));
+            } else if (material != null) {
+                newInputs.add(new ItemStack(material, material.getMaxStackSize()));
+            }
+        }
+        return newInputs;
     }
 
     /**

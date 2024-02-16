@@ -12,7 +12,11 @@ import org.bukkit.inventory.ItemStack;
 
 public class Items {
     public static void init(WorldEditSlimefun plugin) {
-        final ItemGroup WESF_GROUP = new ItemGroup(new NamespacedKey(plugin, "world_edit_slimefun"), new CustomItemStack(Material.STONE_AXE, "&fWorld Edit Slimefun (Dummy Group)"));
+        final ItemGroup WESF_GROUP = new ItemGroup(
+                new NamespacedKey(plugin, "world_edit_slimefun"),
+                new CustomItemStack(Material.STONE_AXE, "&fWorld Edit Slimefun (Dummy Group)")
+        );
+
         new SlimefunItem(
                 WESF_GROUP,
                 new SlimefunItemStack(
