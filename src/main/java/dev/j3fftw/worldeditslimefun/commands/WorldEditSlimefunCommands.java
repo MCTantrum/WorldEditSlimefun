@@ -52,8 +52,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         completions.registerCompletion("slimefun_blocks", context -> Utils.SLIMEFUN_BLOCKS);
         completions.registerCompletion("slimefun_items", context -> Utils.SLIMEFUN_ITEMS);
         completions.registerCompletion("materials", context -> {
-            final List<String> inputs = new ArrayList<>();
-            final World world = context.getPlayer().getWorld();
+            List<String> inputs = new ArrayList<>();
+            World world = context.getPlayer().getWorld();
             for (Material material : Utils.MATERIALS.values()) {
                 if (material.isEnabledByFeature(world)) {
                     inputs.add(material.name());
@@ -125,8 +125,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
             }
 
             if (fillItems) {
-                final BlockMenu menu = BlockStorage.getInventory(block);
-                final int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
+                BlockMenu menu = BlockStorage.getInventory(block);
+                int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
                 for (ItemStack input : getInputs(inputs)) {
                     if (menu.pushItem(input, slots) != null) {
                         break;
