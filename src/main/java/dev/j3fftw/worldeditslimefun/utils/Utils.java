@@ -37,14 +37,6 @@ public class Utils {
         SLIMEFUN_ITEMS.sort(Comparator.naturalOrder());
     }
 
-    public static boolean isValidMaterial(String material) {
-        return MATERIALS.containsKey(material);
-    }
-
-    public static Material getMaterial(String material) {
-        return MATERIALS.get(material);
-    }
-
     @Nonnull
     public static String beautifyBlockPosition(@Nonnull BlockPosition position) {
         return "%s, %s, %s (%s)".formatted(position.getX(), position.getY(), position.getZ(), position.getWorld().getName());
