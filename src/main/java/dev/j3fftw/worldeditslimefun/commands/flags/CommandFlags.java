@@ -1,6 +1,8 @@
 package dev.j3fftw.worldeditslimefun.commands.flags;
 
 import co.aikar.commands.BukkitCommandCompletionContext;
+import dev.j3fftw.worldeditslimefun.tasks.RefillInputsTask;
+import dev.j3fftw.worldeditslimefun.tasks.VoidOutputsTask;
 import dev.j3fftw.worldeditslimefun.utils.Utils;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
@@ -24,7 +26,10 @@ import java.util.Map;
 public class CommandFlags {
     public static final Map<String, CommandFlag<?>> FLAG_TYPES = Map.of(
             "--energy", new EnergyFlag(),
-            "--inputs", new InputsFlag()
+            "--inputs", new InputsFlag(),
+            "--refill_inputs_task", new RefillInputsFlag(),
+            "--void_outputs_task", new VoidOutputsFlag(),
+            "--task_timeout", new TimeoutFlag()
     );
 
     public static List<CommandFlag<?>> getFlags(List<String> args) {
@@ -51,13 +56,13 @@ public class CommandFlags {
 
     public static class EnergyFlag extends CommandFlag<Boolean> {
         @Override
-        public void apply(SlimefunItem sfItem, Block block) {
+        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             BlockStorage.addBlockInfo(block, "energy-charge", String.valueOf(Integer.MAX_VALUE), false);
         }
 
         @Override
         public boolean canApply(SlimefunItem sfItem) {
-            return this.value && sfItem instanceof EnergyNetComponent component && component.isChargeable();
+            return this.value != null && this.value && sfItem instanceof EnergyNetComponent component && component.isChargeable();
         }
 
         @Override
@@ -74,7 +79,7 @@ public class CommandFlags {
     public static class InputsFlag extends CommandFlag<List<ItemStack>> {
 
         @Override
-        public void apply(SlimefunItem sfItem, Block block) {
+        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             BlockMenu menu = BlockStorage.getInventory(block);
             int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
             for (ItemStack input : this.value) {
@@ -167,6 +172,108 @@ public class CommandFlags {
                 }
             }
             return (InputsFlag) new InputsFlag().setValue(inputs);
+        }
+    }
+
+    public static class RefillInputsFlag extends CommandFlag<Boolean> {
+
+        private RefillInputsTask task;
+
+        @Override
+        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+            if (task == null) {
+                task = new RefillInputsTask(sfItem);
+
+                for (CommandFlag<?> otherFlag : flags) {
+                    if (otherFlag instanceof TimeoutFlag timeoutFlag) {
+                        task.setTimeout(timeoutFlag.getValue());
+                    } else if (otherFlag instanceof InputsFlag inputsFlag) {
+                        task.setInputs(inputsFlag.getValue());
+                    }
+                }
+            }
+
+            task.addBlock(block);
+        }
+
+        @Override
+        public boolean canApply(SlimefunItem sfItem) {
+            return this.value != null && this.value && Slimefun.getRegistry().getMenuPresets().containsKey(sfItem.getId());
+        }
+
+        @Override
+        public Collection<String> getTabSuggestions(BukkitCommandCompletionContext context) {
+            return List.of("true", "false");
+        }
+
+        @Override
+        public RefillInputsFlag ofValue(String value) {
+            return (RefillInputsFlag) new RefillInputsFlag().setValue(Boolean.parseBoolean(value));
+        }
+    }
+
+    public static class VoidOutputsFlag extends CommandFlag<Boolean> {
+
+        private VoidOutputsTask task;
+
+        @Override
+        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+            if (task == null) {
+                task = new VoidOutputsTask(sfItem);
+
+                for (CommandFlag<?> otherFlag : flags) {
+                    if (otherFlag instanceof TimeoutFlag timeoutFlag) {
+                        task.setTimeout(timeoutFlag.getValue());
+                    }
+                }
+            }
+
+            task.addBlock(block);
+        }
+
+        @Override
+        public boolean canApply(SlimefunItem sfItem) {
+            return this.value != null && this.value && Slimefun.getRegistry().getMenuPresets().containsKey(sfItem.getId());
+        }
+
+        @Override
+        public Collection<String> getTabSuggestions(BukkitCommandCompletionContext context) {
+            return List.of("true", "false");
+        }
+
+        @Override
+        public VoidOutputsFlag ofValue(String value) {
+            return (VoidOutputsFlag) new VoidOutputsFlag().setValue(Boolean.parseBoolean(value));
+        }
+    }
+
+    public static class TimeoutFlag extends CommandFlag<Integer> {
+
+        @Override
+        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+
+        }
+
+        @Override
+        public boolean canApply(SlimefunItem sfItem) {
+            return sfItem != null && this.value != null && this.value > 0;
+        }
+
+        @Override
+        public Collection<String> getTabSuggestions(BukkitCommandCompletionContext context) {
+            return List.of("30s", "5m", "1h");
+        }
+
+        @Override
+        public TimeoutFlag ofValue(String value) {
+            int multiplier = switch(value.charAt(value.length() -1)) {
+                case 's' -> 20;
+                case 'm' -> 20 * 60;
+                case 'h' -> 20 * 60 * 60;
+                default -> 0;
+            };
+
+            return (TimeoutFlag) new TimeoutFlag().setValue(multiplier * Integer.parseInt(value.substring(0, value.length() - 1)));
         }
     }
 }

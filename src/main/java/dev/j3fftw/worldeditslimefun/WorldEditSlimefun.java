@@ -14,8 +14,12 @@ import java.io.File;
 
 public final class WorldEditSlimefun extends JavaPlugin implements SlimefunAddon {
 
+    private static WorldEditSlimefun instance;
+
     @Override
     public void onEnable() {
+        instance = this;
+
         if (!new File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
@@ -44,5 +48,9 @@ public final class WorldEditSlimefun extends JavaPlugin implements SlimefunAddon
     @Override
     public String getBugTrackerURL() {
         return "https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/issues";
+    }
+
+    public static WorldEditSlimefun getInstance() {
+        return instance;
     }
 }

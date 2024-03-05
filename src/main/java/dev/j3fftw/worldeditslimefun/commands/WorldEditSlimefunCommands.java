@@ -140,7 +140,7 @@ public class WorldEditSlimefunCommands extends BaseCommand {
             });
 
             for (CommandFlag<?> flag : flags) {
-                flag.apply(sfItem, block);
+                flag.apply(flags, sfItem, block);
             }
         });
         long time = System.currentTimeMillis() - start;

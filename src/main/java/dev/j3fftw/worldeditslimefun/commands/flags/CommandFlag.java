@@ -5,6 +5,7 @@ import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import org.bukkit.block.Block;
 
 import java.util.Collection;
+import java.util.List;
 
 public abstract class CommandFlag<T> {
     protected T value;
@@ -14,7 +15,11 @@ public abstract class CommandFlag<T> {
         return this;
     }
 
-    public abstract void apply(SlimefunItem sfItem, Block block);
+    public T getValue() {
+        return value;
+    }
+
+    public abstract void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block);
     public abstract boolean canApply(SlimefunItem sfItem);
     public abstract Collection<String> getTabSuggestions(BukkitCommandCompletionContext context);
 
