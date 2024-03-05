@@ -85,6 +85,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
     @Subcommand("wand")
     public void onWand(Player player) {
         ItemStack wand = SlimefunItem.getOptionalById("WESF_WAND").map(SlimefunItem::getItem).orElse(null);
+
+        // This should never be reached
         if (wand == null) {
             player.sendMessage(ChatColor.RED + "Wand not found!");
             return;
