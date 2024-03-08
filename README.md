@@ -13,4 +13,4 @@ This can be helpful with testing how optimized the blocks are or if they would c
 - `/wesf clear <boolean>` This command clears the blocks you have selected with the position commands. When `true` it fires a blockbreakevent coming from a player. This is used to clear all the handlers. When `false` it just removes the block and the blockstorage data.
 
 ## Download
-You can find the download of this addon in the [releases](https://github.com/Slimefun-Addon-Community/WorldEditSlimefun/releases/tag/latest) tab
+You can find the download of this addon in on [Blob Builds](https://blob.build/project/WorldEditSlimefun).
