@@ -32,7 +32,7 @@ public class RefillInputsTask extends AbstractTask {
         }
 
         for (ItemStack itemStack : this.inputs) {
-            menu.pushItem(itemStack, this.slots);
+            menu.pushItem(new ItemStack(itemStack), this.slots);
         }
     }
 

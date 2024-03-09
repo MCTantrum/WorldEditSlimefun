@@ -83,7 +83,7 @@ public class CommandFlags {
             BlockMenu menu = BlockStorage.getInventory(block);
             int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
             for (ItemStack input : this.value) {
-                if (menu.pushItem(input, slots) != null) {
+                if (menu.pushItem(new ItemStack(input), slots) != null) {
                     break;
                 }
             }
