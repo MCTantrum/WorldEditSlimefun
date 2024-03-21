@@ -1,12 +1,14 @@
 package dev.j3fftw.worldeditslimefun;
 
 import dev.j3fftw.worldeditslimefun.commands.WorldEditSlimefunCommands;
+import dev.j3fftw.worldeditslimefun.listeners.RegistryListener;
 import dev.j3fftw.worldeditslimefun.slimefun.Items;
-import dev.j3fftw.worldeditslimefun.slimefun.WandListener;
+import dev.j3fftw.worldeditslimefun.listeners.WandListener;
 import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.updater.BlobBuildUpdater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nonnull;
@@ -32,7 +34,10 @@ public final class WorldEditSlimefun extends JavaPlugin implements SlimefunAddon
 
         Items.init(this);
         WorldEditSlimefunCommands.init(this);
-        Bukkit.getPluginManager().registerEvents(new WandListener(), this);
+
+        PluginManager manager = Bukkit.getPluginManager();
+        manager.registerEvents(new WandListener(), this);
+        manager.registerEvents(new RegistryListener(), this);
     }
 
     @Override
