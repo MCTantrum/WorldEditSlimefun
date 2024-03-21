@@ -1,4 +1,4 @@
-package dev.j3fftw.worldeditslimefun.slimefun;
+package dev.j3fftw.worldeditslimefun.listeners;
 
 import dev.j3fftw.worldeditslimefun.utils.PositionManager;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;

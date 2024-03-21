@@ -19,7 +19,7 @@ public class Utils {
     public static final List<String> SLIMEFUN_ITEMS = new ArrayList<>();
     public static final Map<String, Material> MATERIALS = new HashMap<>();
 
-    static {
+    public static void init() {
         for (SlimefunItem item : Slimefun.getRegistry().getEnabledSlimefunItems()) {
             if (!(item instanceof UnplaceableBlock) && item.getItem().getType().isBlock()) {
                 SLIMEFUN_BLOCKS.add(item.getId());
