@@ -50,7 +50,7 @@ public class WorldEditSlimefunCommands extends BaseCommand {
         completions.registerStaticCompletion("slimefun_blocks", Utils.SLIMEFUN_BLOCKS);
         completions.registerAsyncCompletion("command_flags", context -> {
             List<String> args = new ArrayList<>(Arrays.asList(context.getContextValueByName(String[].class, "commandFlags")));
-            List<String> availableFlags = new ArrayList<>(CommandFlags.FLAG_TYPES.keySet());
+            List<String> availableFlags = new ArrayList<>(CommandFlags.getFlagTypes().keySet());
             availableFlags.removeAll(args);
 
             if (args.isEmpty()) {
@@ -63,8 +63,8 @@ public class WorldEditSlimefunCommands extends BaseCommand {
             }
 
             String lastArg = args.get(args.size() - 1);
-            if (CommandFlags.FLAG_TYPES.containsKey(lastArg)) {
-                return CommandFlags.FLAG_TYPES.get(lastArg).getTabSuggestions(context);
+            if (CommandFlags.getFlagTypes().containsKey(lastArg)) {
+                return CommandFlags.getFlagTypes().get(lastArg).getTabSuggestions(context);
             }
 
             if (args.size() % 2 == 0) {
@@ -140,7 +140,7 @@ public class WorldEditSlimefunCommands extends BaseCommand {
             });
 
             for (CommandFlag<?> flag : flags) {
-                flag.apply(flags, sfItem, block);
+                flag.apply(player, flags, sfItem, block);
             }
         });
         long time = System.currentTimeMillis() - start;

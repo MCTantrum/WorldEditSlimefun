@@ -14,25 +14,48 @@ import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class CommandFlags {
-    public static final Map<String, CommandFlag<?>> FLAG_TYPES = Map.of(
+    private static final Map<String, CommandFlag<?>> FLAG_TYPES = new HashMap<>(Map.of(
             "--energy", new EnergyFlag(),
             "--inputs", new InputsFlag(),
             "--refill_inputs_task", new RefillInputsFlag(),
             "--void_outputs_task", new VoidOutputsFlag(),
             "--task_timeout", new TimeoutFlag()
-    );
+    ));
 
-    public static List<CommandFlag<?>> getFlags(List<String> args) {
+    /**
+     * Takes a type and value and converts it into a matching {@link CommandFlag}
+     * @param type The type of flag to get, formatted as "--type"
+     * @param value The value of the flag to get, format depends on the type provided
+     * @return the matching {@link CommandFlag} or null if one could not be found
+     */
+    public static @Nullable CommandFlag<?> getFlag(@Nonnull String type, @Nonnull String value) {
+        CommandFlag<?> flag = FLAG_TYPES.get(type);
+        if (flag != null) {
+            return flag.ofValue(value);
+        }
+        return null;
+    }
+
+    /**
+     * Translates the provided args into {@link CommandFlag CommandFlags}
+     * @param args The args to convert, formatted as: {"--energy", "true", "--task_timeout", "10s"}
+     * @return The command flags from the given arguments, empty if arguments are invalid
+     */
+    public static @Nonnull List<CommandFlag<?>> getFlags(@Nonnull List<String> args) {
         List<CommandFlag<?>> flags = new ArrayList<>();
         for (int i = 0; i < args.size(); i++) {
             String arg = args.get(i);
@@ -46,17 +69,30 @@ public class CommandFlags {
         return flags;
     }
 
-    public static CommandFlag<?> getFlag(String type, String value) {
-        CommandFlag<?> flag = FLAG_TYPES.get(type);
-        if (flag != null) {
-            return flag.ofValue(value);
+    /**
+     * Attempts to register the flag type, fails if there is already a flag for the given flag type
+     * @param type A {@link String} flag type in the format of "--type"
+     * @param flag The {@link CommandFlag} for the given flag type
+     * @return If the flag type was successfully registered
+     */
+    public static boolean addFlagType(@Nonnull String type, @Nonnull CommandFlag<?> flag) {
+        if (FLAG_TYPES.containsKey(type)) {
+            return false;
         }
-        return null;
+        FLAG_TYPES.put(type, flag);
+        return true;
+    }
+
+    /**
+     * @return An unmodifiable copy of {@link CommandFlags#FLAG_TYPES}
+     */
+    public static @Nonnull Map<String, CommandFlag<?>> getFlagTypes() {
+        return Map.copyOf(FLAG_TYPES);
     }
 
     public static class EnergyFlag extends CommandFlag<Boolean> {
         @Override
-        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+        public void apply(Player player, List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             BlockStorage.addBlockInfo(block, "energy-charge", String.valueOf(Integer.MAX_VALUE), false);
         }
 
@@ -79,7 +115,7 @@ public class CommandFlags {
     public static class InputsFlag extends CommandFlag<List<ItemStack>> {
 
         @Override
-        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+        public void apply(Player player, List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             BlockMenu menu = BlockStorage.getInventory(block);
             int[] slots = menu.getPreset().getSlotsAccessedByItemTransport(ItemTransportFlow.INSERT);
             for (ItemStack input : this.value) {
@@ -180,7 +216,7 @@ public class CommandFlags {
         private RefillInputsTask task;
 
         @Override
-        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+        public void apply(Player player, List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             if (task == null) {
                 task = new RefillInputsTask(sfItem);
 
@@ -217,7 +253,7 @@ public class CommandFlags {
         private VoidOutputsTask task;
 
         @Override
-        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+        public void apply(Player player, List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
             if (task == null) {
                 task = new VoidOutputsTask(sfItem);
 
@@ -250,7 +286,7 @@ public class CommandFlags {
     public static class TimeoutFlag extends CommandFlag<Integer> {
 
         @Override
-        public void apply(List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
+        public void apply(Player player, List<CommandFlag<?>> flags, SlimefunItem sfItem, Block block) {
 
         }
 
